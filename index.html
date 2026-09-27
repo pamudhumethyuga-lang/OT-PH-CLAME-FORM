@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>සේවා දිනය - අතිකාල / දීමනා තැබුම</title>
+<meta name="theme-color" content="#1b6e5c">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --ink:#20261f; --ink-soft:#5b6157;
+  --line:#e2ddd0; --accent:#1b6e5c; --accent-ink:#ffffff;
+  --accent-soft:#e6f2ee; --warn:#b5541e; --warn-soft:#fbeee4;
+  --radius:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14181a; --card:#1d2224; --ink:#eef0ea; --ink-soft:#a7ada3;
+    --line:#2c3234; --accent:#3fa989; --accent-ink:#0d1210;
+    --accent-soft:#1c2e29; --warn:#e0834a; --warn-soft:#2e2119;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181a; --card:#1d2224; --ink:#eef0ea; --ink-soft:#a7ada3;
+  --line:#2c3234; --accent:#3fa989; --accent-ink:#0d1210;
+  --accent-soft:#1c2e29; --warn:#e0834a; --warn-soft:#2e2119;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Noto Sans Sinhala","Iskoola Pota",-apple-system,system-ui,sans-serif;
+  min-height:100vh; line-height:1.5;
+}
+header{
+  padding:18px 16px 14px; position:sticky; top:0; z-index:5;
+  background:var(--accent); color:var(--accent-ink);
+  padding-top:calc(18px + env(safe-area-inset-top,0px));
+}
+header h1{margin:0; font-size:1.15rem; font-weight:700;}
+header p{margin:3px 0 0; font-size:.8rem; opacity:.85;}
+.wrap{max-width:760px; margin:0 auto; padding:14px 12px 40px;}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px; margin-bottom:14px;
+}
+.card h2{margin:0 0 12px; font-size:1rem; color:var(--accent);}
+label{display:block; font-size:.82rem; color:var(--ink-soft); margin:10px 0 4px;}
+input,select,textarea{
+  width:100%; padding:10px 11px; border-radius:10px; border:1px solid var(--line);
+  background:var(--bg); color:var(--ink); font-size:.95rem; font-family:inherit;
+}
+textarea{resize:vertical; min-height:48px;}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.type-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;}
+.type-tabs button{
+  flex:1; min-width:100px; padding:9px 6px; border-radius:10px; border:1px solid var(--line);
+  background:var(--bg); color:var(--ink-soft); font-size:.82rem; cursor:pointer;
+}
+.type-tabs button.active{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600;}
+.btn{
+  display:inline-block; padding:10px 16px; border-radius:10px; border:none;
+  background:var(--accent); color:var(--accent-ink); font-weight:600; font-size:.9rem; cursor:pointer;
+}
+.btn.secondary{background:var(--accent-soft); color:var(--accent);}
+.btn.ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--line);}
+.btn-row{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+.summary{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+.stat{background:var(--accent-soft); border-radius:12px; padding:10px; text-align:center;}
+.stat .n{font-size:1.25rem; font-weight:700; color:var(--accent);}
+.stat .l{font-size:.72rem; color:var(--ink-soft); margin-top:2px;}
+table{width:100%; border-collapse:collapse; font-size:.85rem;}
+th,td{text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top;}
+th{color:var(--ink-soft); font-weight:600; font-size:.75rem;}
+.tbl-wrap{overflow-x:auto;}
+.grid-tbl{width:100%; border-collapse:collapse; font-size:.82rem; min-width:600px;}
+.grid-tbl th,.grid-tbl td{border:1px solid var(--line); padding:7px 8px; text-align:center;}
+.grid-tbl th{background:var(--accent-soft); color:var(--accent); font-size:.72rem; font-weight:700;}
+.grid-tbl td.no{color:var(--ink-soft); font-weight:600; width:34px;}
+.grid-tbl td.desc{text-align:left;}
+.grid-tbl tbody tr:nth-child(even){background:rgba(127,127,127,.05);}
+.sub-h{font-size:.85rem; font-weight:700; color:var(--accent); margin:14px 0 8px;}
+.sub-h:first-child{margin-top:0;}
+.tag{display:inline-block; padding:2px 8px; border-radius:20px; font-size:.7rem; font-weight:600;}
+.tag.ot{background:var(--accent-soft); color:var(--accent);}
+.tag.tv{background:var(--warn-soft); color:var(--warn);}
+.tag.hd{background:#e7e3fb; color:#5b3ec9;}
+:root[data-theme="dark"] .tag.hd, @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.hd{background:#2a2440; color:#b3a3f5;}}
+.del{background:none; border:none; color:var(--warn); cursor:pointer; font-size:.78rem; text-decoration:underline;}
+.empty{color:var(--ink-soft); font-size:.85rem; text-align:center; padding:18px 0;}
+.month-nav{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px;}
+.month-nav .lbl{font-weight:700; font-size:1rem;}
+.icon-btn{background:var(--accent-soft); color:var(--accent); border:none; border-radius:8px; width:34px; height:34px; font-size:1rem; cursor:pointer;}
+.theme-toggle{background:rgba(255,255,255,.18); border:none; color:var(--accent-ink); border-radius:8px; padding:6px 10px; font-size:.78rem; cursor:pointer;}
+.foot-note{font-size:.72rem; color:var(--ink-soft); text-align:center; margin-top:6px;}
+
+/* Print form */
+#printArea{display:none;}
+@media print{
+  body *{visibility:hidden;}
+  #printArea, #printArea *{visibility:visible;}
+  #printArea{display:block; position:absolute; top:0; left:0; width:100%; padding:10px; color:#000; background:#fff;}
+  #printArea table{width:100%; border-collapse:collapse;}
+  #printArea th, #printArea td{border:1px solid #333; padding:5px 6px; font-size:12px;}
+  #printArea h1{font-size:16px; margin:0 0 2px;}
+  #printArea h2{font-size:13px; margin:14px 0 4px;}
+  .sign{margin-top:34px; display:flex; justify-content:space-between; font-size:12px;}
+  .sign div{border-top:1px solid #333; width:180px; padding-top:4px; text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap" style="padding:0; display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <svg width="30" height="30" viewBox="0 0 64 64" style="flex-shrink:0;" aria-hidden="true">
+        <circle cx="32" cy="32" r="27" fill="none" stroke="#ffffff" stroke-width="5"/>
+        <path d="M32 17 V32 L44 39" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1 style="margin:0;">සේවා දිනය</h1>
+        <p style="margin:3px 0 0;">අතිකාල • ගමන් වියදම් • නිවාඩු දින දීමනා</p>
+      </div>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>👤 මගේ විස්තර (Print පෝරමයට)</h2>
+    <label>වැටුප් අංකය</label>
+    <input id="pSalaryNo" placeholder="වැටුප් අංකය">
+    <label>අනුක්‍රමික අංකය</label>
+    <input id="pSeqNo" placeholder="අනුක්‍රමික අංකය">
+    <label>නම</label>
+    <input id="pName" placeholder="සම්පූර්ණ නම">
+    <label>තනතුර</label>
+    <input id="pDesig" placeholder="තනතුර">
+    <label>සේවය කරනු ලබන ස්ථානය</label>
+    <input id="pWorkplace" placeholder="සේවය කරනු ලබන ස්ථානය">
+    <label>වැටුප් ගෙවන කාර්‍යාලය</label>
+    <input id="pPayOffice" placeholder="වැටුප් ගෙවන කාර්‍යාලය">
+    <label>අනුමත අතිකාල පැය ගණන</label>
+    <input id="pApprovedHrs" type="number" step="0.5" placeholder="උදා: 8">
+    <label>මූලික වැටුප</label>
+    <input id="pBasicSalary" type="number" step="0.01" placeholder="Rs.">
+    <label>අතිකාල පැයකට ගෙවන ගණන</label>
+    <input id="pOTRate" type="number" step="0.01" placeholder="Rs. per hour">
+  </div>
+
+  <div class="card" id="entryFormCard">
+    <h2 id="formTitle">➕ නව සටහනක්</h2>
+    <div class="type-tabs" id="typeTabs">
+      <button data-t="OT" onclick="setType('OT')">අතිකාල</button>
+      <button data-t="TV" onclick="setType('TV')">ගමන් වියදම්</button>
+      <button data-t="HD" onclick="setType('HD')">නිවාඩු දින සේවය</button>
+    </div>
+    <label>දිනය</label>
+    <input type="date" id="fDate">
+
+    <div id="fields-OT">
+      <div class="row2">
+        <div><label>පැමිණි වේලාව</label><input type="time" id="otIn"></div>
+        <div><label>පිට වූ වේලාව</label><input type="time" id="otOut"></div>
+      </div>
+      <p class="foot-note" id="otPreview" style="text-align:left;margin:4px 2px 0;"></p>
+      <label>විස්තරය</label>
+      <select id="otNote">
+        <option value="">-- තෝරන්න --</option>
+        <option value="දිවා සේවය">දිවා සේවය</option>
+        <option value="රාත්‍රී සේවය">රාත්‍රී සේවය</option>
+        <option value="අතිකාල රාත්‍රී සේවය">අතිකාල රාත්‍රී සේවය</option>
+        <option value="රාත්‍රී සේවයට පෙර අතිකාල සේවය">රාත්‍රී සේවයට පෙර අතිකාල සේවය</option>
+        <option value="රාත්‍රී සේවයට පසු අතිකාල සේවය">රාත්‍රී සේවයට පසු අතිකාල සේවය</option>
+        <option value="නිදි විවේක දින අතිකාල සේවය">නිදි විවේක දින අතිකාල සේවය</option>
+      </select>
+    </div>
+
+    <div id="fields-TV" style="display:none">
+      <label>ගමන් විස්තරය</label>
+      <input id="tvDesc" placeholder="සිට - දක්වා / අරමුණ">
+      <label>මුදල (Rs.)</label>
+      <input type="number" step="0.01" id="tvAmount" placeholder="0.00">
+    </div>
+
+    <div id="fields-HD" style="display:none">
+      <label>විස්තරය</label>
+      <input id="hdDesc" placeholder="උදා: වෙසක් පොහොය - කාර්යාලීය රාජකාරි">
+      <label>සේවය කළ පැය ප්‍රමාණය (විකල්පයි)</label>
+      <input type="number" step="0.5" id="hdHours" placeholder="8">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="saveBtn" onclick="saveEntry()">සටහන එකතු කරන්න</button>
+      <button class="btn ghost" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">අවලංගු කරන්න</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="month-nav">
+      <button class="icon-btn" onclick="shiftMonth(-1)">‹</button>
+      <div class="lbl" id="monthLabel"></div>
+      <button class="icon-btn" onclick="shiftMonth(1)">›</button>
+    </div>
+    <div class="summary">
+      <div class="stat"><div class="n" id="sumOT">0</div><div class="l">අතිකාල පැය</div></div>
+      <div class="stat"><div class="n" id="sumTV">0</div><div class="l">ගමන් වියදම් (Rs.)</div></div>
+      <div class="stat"><div class="n" id="sumHD">0</div><div class="l">නිවාඩු දින සේවා</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📋 සටහන් ලැයිස්තුව</h2>
+    <div class="tbl-wrap" id="listWrap"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn secondary" onclick="doPrint()">🖨️ මාසික පෝරමය Print කරන්න</button>
+  </div>
+  <p class="foot-note">දත්ත ඔබේ මෙම browser එකේ පමණක් save වේ. වෙනත් device එකකින් access කළ නොහැක.</p>
+</div>
+
+<!-- Printable area -->
+<div id="printArea">
+  <h1></h1>
+  <div id="pMeta"></div>
+  <h2>අතිකාල සටහන්</h2>
+  <table id="pOTTable"><thead><tr><th>අනු අංකය</th><th>දිනය</th><th>පැමිණි වේලාව</th><th>පිටත් වූ වේලාව</th><th>අවසන් කර ඇති පැය ගණන</th><th>සේවා මුරය</th><th>අතිකාල පැය ගණන</th><th>විස්තරය</th></tr></thead><tbody></tbody></table>
+  <p><b>මුළු අතිකාල පැය: </b><span id="pOTTotal"></span></p>
+
+  <h2>ගමන් වියදම් දීමනා</h2>
+  <table id="pTVTable"><thead><tr><th>අනු අංකය</th><th>දිනය</th><th>විස්තරය</th><th>මුදල (Rs.)</th></tr></thead><tbody></tbody></table>
+  <p><b>මුළු ගමන් වියදම්: Rs. </b><span id="pTVTotal"></span></p>
+
+  <h2>නිවාඩු දින සේවා දීමනා</h2>
+  <table id="pHDTable"><thead><tr><th>අනු අංකය</th><th>දිනය</th><th>විස්තරය</th><th>පැය</th></tr></thead><tbody></tbody></table>
+  <p><b>මුළු නිවාඩු දින සේවා: </b><span id="pHDTotal"></span></p>
+
+  <div class="sign">
+    <div>සේවකයාගේ අත්සන</div>
+    <div>අනුමත නිලධාරියාගේ අත්සන</div>
+  </div>
+</div>
+
+<script>
+const LS_ENTRIES='sd_entries', LS_PROFILE='sd_profile', LS_THEME='sd_theme';
+let entries=[]; let profile={}; let curType='OT';
+let viewDate=new Date(); viewDate.setDate(1);
+const STANDARD_DAILY_HOURS=8; // දෛනික සම්මත සේවා පැය - අතිකාල ගණනයට පාවිච්චි වේ (6.30-14.30 = 8h උදාහරණය අනුව)
+
+function safeGet(k,d){try{const v=localStorage.getItem(k); return v?JSON.parse(v):d;}catch(e){return d;}}
+function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+const PROFILE_FIELDS=['pSalaryNo','pSeqNo','pName','pDesig','pWorkplace','pPayOffice','pApprovedHrs','pBasicSalary','pOTRate'];
+function load(){
+  entries=safeGet(LS_ENTRIES,[]);
+  profile=safeGet(LS_PROFILE,{});
+  PROFILE_FIELDS.forEach(id=>{document.getElementById(id).value=profile[id]||'';});
+  const theme=safeGet(LS_THEME,null);
+  if(theme) document.documentElement.setAttribute('data-theme',theme);
+  document.getElementById('fDate').value=new Date().toISOString().slice(0,10);
+}
+function attachListeners(){
+  PROFILE_FIELDS.forEach(id=>{
+    document.getElementById(id).addEventListener('change',saveProfile);
+  });
+  ['otIn','otOut'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('input',updateOtPreview);
+    el.addEventListener('change',updateOtPreview);
+  });
+  document.getElementById('otNote').addEventListener('change',updateOtPreview);
+}
+function saveProfile(){
+  profile={};
+  PROFILE_FIELDS.forEach(id=>{profile[id]=document.getElementById(id).value;});
+  safeSet(LS_PROFILE,profile);
+  updateOtPreview();
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  safeSet(LS_THEME,next);
+}
+
+function timeToMin(t){
+  if(!t) return null;
+  const [h,m]=t.split(':').map(Number);
+  return h*60+m;
+}
+function shiftType(inT){
+  const m=timeToMin(inT);
+  if(m===null) return null;
+  return (m>=360 && m<1080) ? 'day' : 'night'; // 06:00–17:59 => day, else night
+}
+function shiftLabel(s){
+  if(s==='day') return 'දිවා සේවා මුරය';
+  if(s==='night') return 'රාත්‍රී සේවා මුරය';
+  return '';
+}
+const OT_FULL_MODES=["අතිකාල රාත්‍රී සේවය","රාත්‍රී සේවයට පෙර අතිකාල සේවය","රාත්‍රී සේවයට පසු අතිකාල සේවය","නිදි විවේක දින අතිකාල සේවය"];
+function approvedHrsForNote(note){
+  return OT_FULL_MODES.includes(note) ? 0 : STANDARD_DAILY_HOURS;
+}
+function calcOT(inT,outT,approvedHrs){
+  const a=timeToMin(inT), o=timeToMin(outT);
+  if(a===null||o===null) return null;
+  let worked=o-a; if(worked<=0) worked+=24*60;
+  const approvedMin=(approvedHrs!=null?approvedHrs:8)*60;
+  const otMin=Math.max(0, worked-approvedMin);
+  return {workedHours:+(worked/60).toFixed(2), otHours:+(otMin/60).toFixed(2), crossesMidnight:(o<=a), shift:shiftType(inT)};
+}
+function updateOtPreview(){
+  const inT=document.getElementById('otIn').value, outT=document.getElementById('otOut').value;
+  const note=document.getElementById('otNote').value;
+  const approvedHrs=approvedHrsForNote(note);
+  const box=document.getElementById('otPreview');
+  const r=calcOT(inT,outT,approvedHrs);
+  if(!r){box.textContent='';return;}
+  const basisTxt=approvedHrs>0 ? `(අනුමත ${approvedHrs} පැයෙන් පසු) → අතිකාල: <b>${r.otHours} පැය</b>` : `→ සම්පූර්ණ සේවා කාලයම අතිකාල: <b>${r.otHours} පැය</b>`;
+  box.innerHTML=`<b>${shiftLabel(r.shift)}</b> • සේවා කාලය: <b>${r.workedHours} පැය</b> ${basisTxt}${r.crossesMidnight?' • පසුදින දක්වා':''}`;
+}
+
+function setType(t){
+  curType=t;
+  document.querySelectorAll('.type-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  ['OT','TV','HD'].forEach(x=>document.getElementById('fields-'+x).style.display=(x===t?'block':'none'));
+  if(t==='OT') updateOtPreview();
+}
+setType('OT');
+
+let editingId=null;
+
+function fillForm(e){
+  document.getElementById('fDate').value=e.date;
+  if(e.type==='OT'){
+    document.getElementById('otIn').value=e.inTime;
+    document.getElementById('otOut').value=e.outTime;
+    document.getElementById('otNote').value=e.note||'';
+    updateOtPreview();
+  } else if(e.type==='TV'){
+    document.getElementById('tvDesc').value=e.desc;
+    document.getElementById('tvAmount').value=e.amount;
+  } else {
+    document.getElementById('hdDesc').value=e.desc;
+    document.getElementById('hdHours').value=e.hours||'';
+  }
+}
+function editEntry(id){
+  const e=entries.find(x=>x.id===id);
+  if(!e) return;
+  editingId=id;
+  setType(e.type);
+  fillForm(e);
+  document.getElementById('formTitle').textContent='✏️ සටහන සංස්කරණය';
+  document.getElementById('saveBtn').textContent='යාවත්කාලීන කරන්න';
+  document.getElementById('cancelEditBtn').style.display='inline-block';
+  document.getElementById('typeTabs').style.opacity='.5'; document.getElementById('typeTabs').style.pointerEvents='none';
+  document.getElementById('entryFormCard').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function cancelEdit(){
+  editingId=null;
+  document.getElementById('formTitle').textContent='➕ නව සටහනක්';
+  document.getElementById('saveBtn').textContent='සටහන එකතු කරන්න';
+  document.getElementById('cancelEditBtn').style.display='none';
+  document.getElementById('typeTabs').style.opacity=''; document.getElementById('typeTabs').style.pointerEvents='';
+  document.getElementById('otIn').value=''; document.getElementById('otOut').value=''; document.getElementById('otNote').value=''; document.getElementById('otPreview').textContent='';
+  document.getElementById('tvDesc').value=''; document.getElementById('tvAmount').value='';
+  document.getElementById('hdDesc').value=''; document.getElementById('hdHours').value='';
+}
+
+function saveEntry(){
+  const date=document.getElementById('fDate').value;
+  if(!date){alert('කරුණාකර දිනය තෝරන්න');return;}
+  let e={id:editingId||Date.now(), type:curType, date};
+  if(curType==='OT'){
+    const inT=document.getElementById('otIn').value, outT=document.getElementById('otOut').value;
+    if(!inT||!outT){alert('පැමිණි වේලාව සහ පිට වූ වේලාව දෙකම ඇතුළත් කරන්න');return;}
+    const note=document.getElementById('otNote').value;
+    const approvedHrs=approvedHrsForNote(note);
+    const r=calcOT(inT,outT,approvedHrs);
+    if(r.otHours<=0){alert(approvedHrs>0?'අතිකාල පැයක් ලැබෙන්නේ සේවා කාලය අනුමත පැය ප්‍රමාණයට වඩා වැඩි වූ විට පමණි':'පැමිණි/පිට වූ වේලාවන් නිවැරදිව ඇතුළත් කරන්න');return;}
+    e.inTime=inT; e.outTime=outT; e.approved=approvedHrs; e.worked=r.workedHours; e.ot=r.otHours; e.shift=r.shift; e.note=note;
+  } else if(curType==='TV'){
+    const amt=parseFloat(document.getElementById('tvAmount').value)||0;
+    const desc=document.getElementById('tvDesc').value;
+    if(!desc){alert('ගමන් විස්තරය ඇතුළත් කරන්න');return;}
+    e.desc=desc; e.amount=amt;
+  } else {
+    const desc=document.getElementById('hdDesc').value;
+    if(!desc){alert('විස්තරය ඇතුළත් කරන්න');return;}
+    e.desc=desc; e.hours=parseFloat(document.getElementById('hdHours').value)||0;
+  }
+  if(editingId){
+    const idx=entries.findIndex(x=>x.id===editingId);
+    if(idx>-1) entries[idx]=e;
+  } else {
+    entries.push(e);
+  }
+  safeSet(LS_ENTRIES,entries);
+  cancelEdit();
+  render();
+}
+function delEntry(id){
+  if(editingId===id) cancelEdit();
+  entries=entries.filter(e=>e.id!==id);
+  safeSet(LS_ENTRIES,entries);
+  render();
+}
+function shiftMonth(n){
+  viewDate.setMonth(viewDate.getMonth()+n);
+  render();
+}
+function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function inView(e){return e.date.slice(0,7)===monthKey(viewDate);}
+const monthNamesSi=['ජනවාරි','පෙබරවාරි','මාර්තු','අප්‍රේල්','මැයි','ජූනි','ජූලි','අගෝස්තු','සැප්තැම්බර්','ඔක්තෝබර්','නොවැම්බර්','දෙසැම්බර්'];
+
+function typeTag(t){
+  if(t==='OT') return '<span class="tag ot">අතිකාල</span>';
+  if(t==='TV') return '<span class="tag tv">ගමන් වියදම්</span>';
+  return '<span class="tag hd">නිවාඩු දින</span>';
+}
+function fmtNum(n){
+  n=+n||0;
+  return (Math.round(n*100)/100).toString();
+}
+function render(){
+  document.getElementById('monthLabel').textContent=monthNamesSi[viewDate.getMonth()]+' '+viewDate.getFullYear();
+  const list=entries.filter(inView).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  const otList=list.filter(e=>e.type==='OT');
+  const tvList=list.filter(e=>e.type==='TV');
+  const hdList=list.filter(e=>e.type==='HD');
+  const otSum=otList.reduce((s,e)=>s+e.ot,0);
+  const tvSum=tvList.reduce((s,e)=>s+e.amount,0);
+  document.getElementById('sumOT').textContent=fmtNum(otSum);
+  document.getElementById('sumTV').textContent=fmtNum(tvSum);
+  document.getElementById('sumHD').textContent=hdList.length;
+
+  const wrap=document.getElementById('listWrap');
+  if(list.length===0){
+    wrap.innerHTML='<div class="empty">මෙම මාසය සඳහා සටහන් නැත</div>';
+    return;
+  }
+  let html='';
+
+  if(otList.length){
+    html+='<div class="sub-h">⏱️ අතිකාල සටහන්</div><table class="grid-tbl"><thead><tr>'+
+      '<th>අනු අංකය</th><th>දිනය</th><th>පැමිණි වේලාව</th><th>පිටත් වූ වේලාව</th>'+
+      '<th>අවසන් කර ඇති පැය ගණන</th><th>සේවා මුරය</th><th>අතිකාල පැය ගණන</th><th></th>'+
+      '</tr></thead><tbody>';
+    otList.forEach((e,i)=>{
+      html+=`<tr><td class="no">${i+1}</td><td>${e.date}</td><td>${e.inTime}</td><td>${e.outTime}</td>`+
+        `<td>${fmtNum(e.worked)}</td><td>${shiftLabel(e.shift)}</td><td><b>${fmtNum(e.ot)}</b></td>`+
+        `<td style="white-space:nowrap"><button class="del" style="color:var(--accent)" onclick="editEntry(${e.id})">✏️</button> <button class="del" onclick="delEntry(${e.id})">🗑️</button></td></tr>`;
+    });
+    html+=`<tr><td colspan="6" style="text-align:right;font-weight:700;">මුළු අතිකාල පැය</td><td style="font-weight:700;">${fmtNum(otSum)}</td><td></td></tr>`;
+    html+='</tbody></table>';
+  }
+
+  if(tvList.length){
+    html+='<div class="sub-h">🚗 ගමන් වියදම් දීමනා</div><table class="grid-tbl"><thead><tr>'+
+      '<th>අනු අංකය</th><th>දිනය</th><th>විස්තරය</th><th>මුදල (Rs.)</th><th></th></tr></thead><tbody>';
+    tvList.forEach((e,i)=>{
+      html+=`<tr><td class="no">${i+1}</td><td>${e.date}</td><td class="desc">${esc(e.desc)}</td><td><b>${e.amount.toFixed(2)}</b></td>`+
+        `<td style="white-space:nowrap"><button class="del" style="color:var(--accent)" onclick="editEntry(${e.id})">✏️</button> <button class="del" onclick="delEntry(${e.id})">🗑️</button></td></tr>`;
+    });
+    html+=`<tr><td colspan="3" style="text-align:right;font-weight:700;">මුළු ගමන් වියදම්</td><td style="font-weight:700;">${tvSum.toFixed(2)}</td><td></td></tr>`;
+    html+='</tbody></table>';
+  }
+
+  if(hdList.length){
+    html+='<div class="sub-h">🎌 නිවාඩු දින සේවා දීමනා</div><table class="grid-tbl"><thead><tr>'+
+      '<th>අනු අංකය</th><th>දිනය</th><th>විස්තරය</th><th>පැය</th><th></th></tr></thead><tbody>';
+    hdList.forEach((e,i)=>{
+      html+=`<tr><td class="no">${i+1}</td><td>${e.date}</td><td class="desc">${esc(e.desc)}</td><td>${e.hours?fmtNum(e.hours):'-'}</td>`+
+        `<td style="white-space:nowrap"><button class="del" style="color:var(--accent)" onclick="editEntry(${e.id})">✏️</button> <button class="del" onclick="delEntry(${e.id})">🗑️</button></td></tr>`;
+    });
+    html+='</tbody></table>';
+  }
+
+  wrap.innerHTML=html;
+}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function doPrint(){
+  const list=entries.filter(inView).sort((a,b)=>a.date.localeCompare(b.date));
+  const ot=list.filter(e=>e.type==='OT'), tv=list.filter(e=>e.type==='TV'), hd=list.filter(e=>e.type==='HD');
+  document.querySelector('#printArea h1').textContent='මාසික දීමනා ඉල්ලුම් පත්‍රය - '+monthNamesSi[viewDate.getMonth()]+' '+viewDate.getFullYear();
+  document.getElementById('pMeta').innerHTML=`
+    <p style="font-size:12px;margin:2px 0;">
+    <b>වැටුප් අංකය:</b> ${esc(profile.pSalaryNo||'—')} &nbsp; <b>අනුක්‍රමික අංකය:</b> ${esc(profile.pSeqNo||'—')} &nbsp; <b>නම:</b> ${esc(profile.pName||'—')}</p>
+    <p style="font-size:12px;margin:2px 0;">
+    <b>තනතුර:</b> ${esc(profile.pDesig||'—')} &nbsp; <b>සේවය කරනු ලබන ස්ථානය:</b> ${esc(profile.pWorkplace||'—')}</p>
+    <p style="font-size:12px;margin:2px 0;">
+    <b>වැටුප් ගෙවන කාර්‍යාලය:</b> ${esc(profile.pPayOffice||'—')} &nbsp; <b>අනුමත අතිකාල පැය ගණන:</b> ${esc(profile.pApprovedHrs||'—')}</p>
+    <p style="font-size:12px;margin:2px 0;">
+    <b>මූලික වැටුප:</b> ${esc(profile.pBasicSalary||'—')} &nbsp; <b>අතිකාල පැයකට ගෙවන ගණන:</b> ${esc(profile.pOTRate||'—')}</p>`;
+  const otBody=ot.map((e,i)=>`<tr><td>${i+1}</td><td>${e.date}</td><td>${e.inTime}</td><td>${e.outTime}</td><td>${fmtNum(e.worked)}</td><td>${shiftLabel(e.shift)}</td><td>${fmtNum(e.ot)}</td><td>${esc(e.note||'')}</td></tr>`).join('')||'<tr><td colspan="8">සටහන් නැත</td></tr>';
+  document.querySelector('#pOTTable tbody').innerHTML=otBody;
+  const otHrsTotal=ot.reduce((s,e)=>s+e.ot,0);
+  const rate=parseFloat(profile.pOTRate)||0;
+  document.getElementById('pOTTotal').textContent=fmtNum(otHrsTotal)+' පැය'+(rate?'  (ගෙවිය යුතු මුදල: Rs. '+(otHrsTotal*rate).toFixed(2)+')':'');
+
+  const tvBody=tv.map((e,i)=>`<tr><td>${i+1}</td><td>${e.date}</td><td>${esc(e.desc)}</td><td>${e.amount.toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="4">සටහන් නැත</td></tr>';
+  document.querySelector('#pTVTable tbody').innerHTML=tvBody;
+  document.getElementById('pTVTotal').textContent=tv.reduce((s,e)=>s+e.amount,0).toFixed(2);
+
+  const hdBody=hd.map((e,i)=>`<tr><td>${i+1}</td><td>${e.date}</td><td>${esc(e.desc)}</td><td>${e.hours?fmtNum(e.hours):'-'}</td></tr>`).join('')||'<tr><td colspan="4">සටහන් නැත</td></tr>';
+  document.querySelector('#pHDTable tbody').innerHTML=hdBody;
+  document.getElementById('pHDTotal').textContent=hd.length+' දින';
+
+  window.print();
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+load();
+attachListeners();
+render();
+</script>
+</body>
+</html>
